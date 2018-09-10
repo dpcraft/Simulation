@@ -36,12 +36,12 @@ public class Utils {
         }
         values = hashSet.toArray(values);
         ArrayList<Integer> result = new ArrayList<Integer>(Arrays.asList(values));
-        System.out.println("随机污染节点编号：");
-        for (Integer r:result) {
-            System.out.print(r + ", ");
-
-        }
-        System.out.println();
+//        System.out.println("随机污染节点编号：");
+//        for (Integer r:result) {
+//            System.out.print(r + ", ");
+//
+//        }
+//        System.out.println();
         return result;
     }
 
@@ -61,7 +61,7 @@ public class Utils {
             result += check(entry.getKey(), entry.getValue());
 
         }
-        System.out.println("总共实际污染了 " + result + "份");
+//        System.out.println("总共实际污染了 " + result + "份");
         return result;
 
     }
@@ -74,13 +74,13 @@ public class Utils {
      */
     public static int check(Integer offset, ArrayList<Integer> poisonNumOnCircle) {
         int nodesNum = poisonNumOnCircle.remove(0);
-        System.out.println("*" + nodesNum);
-        System.out.print("偏移量为 " + offset + " 节点数目为 " + nodesNum + " 的环，污染节点为：");
+//        System.out.println("*" + nodesNum);
+//        System.out.print("偏移量为 " + offset + " 节点数目为 " + nodesNum + " 的环，污染节点为：");
         HashSet<Integer> poisonNos = new HashSet<Integer>();
         Iterator iterator = poisonNumOnCircle.iterator();
         while(iterator.hasNext()) {
             Integer poisonNo = (Integer)iterator.next();
-            System.out.print(poisonNo + ", ");
+//            System.out.print(poisonNo + ", ");
             if( poisonNumOnCircle.contains(poisonNo % nodesNum + 1)) {
                 poisonNos.add(poisonNo % nodesNum + 1);
             }
@@ -90,11 +90,11 @@ public class Utils {
 
 
         }
-        System.out.println("\n实际污染数据为：");
-        for (Integer no:poisonNos) {
-            System.out.print("D" + no + ", ");
-        }
-        System.out.println("\n******************");
+//        System.out.println("\n实际污染数据为：");
+//        for (Integer no:poisonNos) {
+//            System.out.print("D" + no + ", ");
+//        }
+//        System.out.println("\n******************");
         return poisonNos.size();
 
     }
@@ -134,14 +134,14 @@ public class Utils {
             }
         }
         for(Map.Entry<Integer, ArrayList<Integer>> entry : result.entrySet()){
-            System.out.println("偏移量为" + entry.getKey() + "的arrayList：");
+//            System.out.println("偏移量为" + entry.getKey() + "的arrayList：");
             ArrayList<Integer> list = entry.getValue();
-            for (Integer i: list
-                 ) {
-                System.out.print(i + ", ");
-
-            }
-            System.out.println();
+//            for (Integer i: list
+//                 ) {
+//                System.out.print(i + ", ");
+//
+//            }
+//            System.out.println();
         }
 
         return result;

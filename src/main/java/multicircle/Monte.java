@@ -1,9 +1,10 @@
 package multicircle;
 
-import java.sql.Time;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -12,29 +13,58 @@ import java.util.Map;
  * @time 09:42
  */
 public class Monte {
+    HashMap<Integer, Float[]> resultMap = new HashMap();
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
+        final Monte monte = new Monte();
 
         long startTime = System.currentTimeMillis();
 //      Utils.splitIntegerRando  m(30,15);
-        HashMap<Integer,Float[]> resultMap = new HashMap();
-        int nodeNum = 30;
-        int maxPoisonNo = nodeNum/2;
-        for (int circleNum = 1; circleNum <= maxPoisonNo; circleNum++) {
-            resultMap.put(circleNum, silmu(nodeNum,circleNum));
+
+        final int nodeNum = 30;
+        final Integer[] maxPoisonNo = Utils.splitInteger(nodeNum / 2, 4);
+        for (int i = 1; i < maxPoisonNo.length; i++) {
+            maxPoisonNo[i] += maxPoisonNo[i - 1];
         }
-        for(Map.Entry<Integer, Float[]> entry:resultMap.entrySet()){
-            System.out.println(entry.getKey() + "个环：");
+//        for (int i = 0; i < maxPoisonNo.length; i++) {
+//            System.out.println(maxPoisonNo[i]);
+//        }
+        Thread threadA = new Thread(new myRunnable(1, maxPoisonNo[0], nodeNum, monte));
+        Thread threadB = new Thread(new myRunnable(maxPoisonNo[0] + 1, maxPoisonNo[1], nodeNum, monte));
+        Thread threadC = new Thread(new myRunnable(maxPoisonNo[1] + 1, maxPoisonNo[2], nodeNum, monte));
+        Thread threadD = new Thread(new myRunnable(maxPoisonNo[2] + 1, maxPoisonNo[3], nodeNum, monte));
+        threadA.start();
+        threadB.start();
+        threadC.start();
+        threadD.start();
+        try {
+            threadA.join();
+            threadB.join();
+            threadC.join();
+            threadD.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        File outFile = new File("./out/result.txt");
+        if (!outFile.exists()) {
+            outFile.createNewFile();
+        }
+        OutputStream outputStream = new FileOutputStream(outFile);
+        for (Map.Entry<Integer, Float[]> entry : monte.resultMap.entrySet()) {
             Float[] result = entry.getValue();
-            System.out.print("[");
             for (int i = 0; i < result.length; i++) {
-                System.out.print(result[i] + ", ");
+                outputStream.write((result[i] + " ").getBytes());
             }
-            System.out.println("]");
+            outputStream.write(" \n".getBytes());
         }
         long endTime = System.currentTimeMillis();
         System.out.println("run time " + (endTime - startTime) + " ms");
-        System.out.println("run time " + (endTime - startTime)/1000 + " s");
+        System.out.println("run time " + (endTime - startTime) / 1000 + " s");
+    }
+
+    public void write(int circleNum, int nodeNum) {
+        resultMap.put(circleNum, silmu(nodeNum, circleNum));
     }
 
 
@@ -55,16 +85,28 @@ public class Monte {
             result[poisonNum] = 1f - result[poisonNum] / (float) experimentTimes;
         }
 
-//        System.out.print("[");
-//        for (int i = 0; i < result.length; i++) {
-//            System.out.print(result[i] + ", ");
-//        }
-//        System.out.println("]");
 //        Utils.fig(x,result);
         return result;
 
     }
 
-//[1.0, 1.0, 0.9326, 0.8014, 0.62979996, 0.44529998, 0.28890002, 0.15530002, 0.07669997, 0.028900027, 0.010699987, 0.002399981, 2.9999018E-4, 0.0, 0.0, 0.0, ]
-    // [1.0, 1.0, 0.9283, 0.8028, 0.6286, 0.44709998, 0.29009998, 0.15920001, 0.07230002, 0.03189999, 0.00849998, 0.0019999743, 5.0002337E-4, 0.0, 0.0, 0.0, ]
+
+}
+class myRunnable implements Runnable{
+    Integer startIndex;
+    Integer endIndex;
+    Integer nodeNum;
+    Monte monte;
+    public void run(){
+        for (int circleNum = startIndex; circleNum <= endIndex; circleNum++) {
+            monte.write(circleNum, nodeNum);
+        }
+    }
+
+    public myRunnable(Integer startIndex, Integer endIndex, Integer nodeNum, Monte monte) {
+        this.startIndex = startIndex;
+        this.endIndex = endIndex;
+        this.nodeNum = nodeNum;
+        this.monte = monte;
+    }
 }
