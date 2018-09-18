@@ -19,7 +19,7 @@ import java.util.*;
  */
 public class Utils2 {
     public static void main(String[] args) {
-        generateCircle(30,3);
+        System.out.println(-1 % 4);
     }
 
     /**
@@ -38,17 +38,17 @@ public class Utils2 {
             randomSet.add(random.nextInt(max) + 1);
         }
         values = randomSet.toArray(values);
-        for (int i = 0; i < values.length; i++) {
-            System.out.print(values[i] + ",");
-        }
-        System.out.println();
+//        for (int i = 0; i < values.length; i++) {
+//            System.out.print(values[i] + ",");
+//        }
+//        System.out.println();
         return values;
     }
 
-    public static Map<Integer, Integer[]> generateCircle(int nodeNum, int circleNum){
+    public static HashMap<Integer, Integer[]> generateCircle(int nodeNum, int circleNum){
         Integer[] randomNodeArray = getRandom(nodeNum,nodeNum);
         Integer[] nodesEachCircle = splitIntegerRandom(nodeNum, circleNum);
-        Map<Integer,Integer[]> circle = new HashMap<Integer, Integer[]>();
+        HashMap<Integer,Integer[]> circle = new HashMap<Integer, Integer[]>();
         Integer[] offsets = new Integer[nodesEachCircle.length + 1];
         Integer offset = 0;
         offsets[0] = offset;
@@ -56,9 +56,9 @@ public class Utils2 {
             offset = offset + nodesEachCircle[i];
             offsets[i + 1] = offset;
         }
-        for (int i = 0; i < offsets.length; i++) {
-            System.out.println(offsets[i]);
-        }
+//        for (int i = 0; i < offsets.length; i++) {
+//            System.out.println(offsets[i]);
+//        }
         for (int i = 0; i < offsets.length - 1; i++) {
             Integer[] tmp = new Integer[nodesEachCircle[i]];
             for (int j = offsets[i], k = 0; j < offsets[i + 1]; j++, k++) {
@@ -66,14 +66,14 @@ public class Utils2 {
             }
             circle.put(nodesEachCircle[i], tmp);
         }
-        for (Map.Entry<Integer, Integer[]> entry : circle.entrySet()) {
-            Integer[] result = entry.getValue();
-            System.out.println(entry.getKey() + " : ");
-            for (int i = 0; i < result.length; i++) {
-                System.out.print(result[i] + ",");
-            }
-            System.out.println();
-        }
+//        for (Map.Entry<Integer, Integer[]> entry : circle.entrySet()) {
+//            Integer[] result = entry.getValue();
+//            System.out.println(entry.getKey() + " : ");
+//            for (int i = 0; i < result.length; i++) {
+//                System.out.print(result[i] + ",");
+//            }
+//            System.out.println();
+//        }
         return circle;
 
     }
@@ -122,11 +122,53 @@ public class Utils2 {
             nodesEachCircle[j - 1] = cut[j] - cut[j-1] + 1;
 
         }
-        for (int i = 0; i < nodesEachCircle.length; i++) {
-            System.out.println(nodesEachCircle[i]);
+//        for (int i = 0; i < nodesEachCircle.length; i++) {
+//            System.out.println(nodesEachCircle[i]);
+//
+//        }
+        return nodesEachCircle;
+
+    }
+
+    public static int check(int nodeNum, int circleNum,ArrayList<Integer> poisonNodes){
+        int result = 0;
+        HashMap<Integer, Integer[]> hashMap = generateCircle(nodeNum,circleNum);
+
+        for(Map.Entry<Integer, Integer[]> entry : hashMap.entrySet()) {
+            result += check(poisonNodes, entry.getValue());
 
         }
-        return nodesEachCircle;
+//        System.out.println("总共实际污染了 " + result + "份");
+        return result;
+    }
+
+    /**
+     *
+     * @param poisonNodes
+     * @param poisonNodesEachCircle
+     * @return 该环上污染节点的数目
+     */
+    public static int check(ArrayList<Integer> poisonNodes, Integer[] poisonNodesEachCircle) {
+
+        HashSet<Integer> poisonNos = new HashSet<Integer>();
+        int len = poisonNodesEachCircle.length;
+        for (int i = 0; i < poisonNodesEachCircle.length; i++) {
+            Integer poisonNo = poisonNodesEachCircle[i];
+            if(poisonNodes.contains(poisonNo) && poisonNodes.contains(poisonNodesEachCircle[(i + 1) % len])){
+                poisonNos.add(poisonNodesEachCircle[(i + 1) % len]);
+            }
+            if(poisonNodes.contains(poisonNo) && poisonNodes.contains(poisonNodesEachCircle[(i - 1 + len) % len])){
+                poisonNos.add(poisonNo);
+            }
+
+        }
+
+//        System.out.println("\n实际污染数据为：");
+//        for (Integer no:poisonNos) {
+//            System.out.print("D" + no + ", ");
+//        }
+//        System.out.println("\n******************");
+        return poisonNos.size();
 
     }
 
